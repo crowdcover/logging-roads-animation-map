@@ -1,0 +1,25 @@
+{
+  "id": "2000",
+  "type": "line",
+  "source": "logging",
+  'source-layer': 'original',
+  "minzoom": 0,
+  "maxzoom": 22,
+  "filter": [
+      "==",
+      "start_date",
+      "2000"
+  ],
+  "paint": {
+    "line-color": "#f8ffcc",
+    "line-opacity": 1,
+    "line-cap": "butt",
+    "line-join": "miter",
+    "line-width": {
+      "base": 1,
+      "stops": [[7, 1.5], [8, 2], [9, 3], [10, 3.5], [11, 4], [12, 6]]
+    }
+
+
+  }
+}

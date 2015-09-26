@@ -1,0 +1,17 @@
+{
+  "id": "logging",
+  "type": "line",
+  "source": "logging",
+  'source-layer': 'original',
+  "paint": {
+    "line-color": "yellow",
+    "line-opacity": 1,
+    "line-cap": "butt",
+    "line-join": "miter",
+    "line-width": {
+      "base": 0.2,
+      "stops": [[7, 0.5], [8, 1], [9, 2], [10, 3], [11, 4], [12, 6]]
+    }
+
+  }
+}
