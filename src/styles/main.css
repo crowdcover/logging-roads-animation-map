@@ -30,6 +30,8 @@ html, body, #content, #app {
   color: white;
   z-index: 9999;
   font-size: 3.3em;
+  text-shadow: #000 0px 0px 1px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .lng-lat {
