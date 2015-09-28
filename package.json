@@ -20,6 +20,7 @@
   },
   "homepage": "",
   "dependencies": {
+    "jquery": "^2.1.4",
     "mapbox-gl": "^0.11.0",
     "mapbox-gl-styles": "^1.1.0",
     "materialize-css": "^0.97.1",

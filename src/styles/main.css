@@ -43,3 +43,19 @@ html, body, #content, #app {
   font-size: 1.0em;
   background-color: rgba(0,0,0,0.5);
 }
+
+.playPauseButton {
+  color: #FFF;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+}
+
+
+
+.resumeButton {
+  color: #FFF;
+  position: absolute;
+  left: 75px;
+  bottom: 20px;
+}

@@ -24,7 +24,8 @@ module.exports = React.createClass({
       firstLoad: true,
       waitForStyleChange: false,
       ignoreMoveCount: 0,
-      styleWaitCallback(){}
+      styleWaitCallback(){},
+      playing: false
     }
   },
 
@@ -35,7 +36,8 @@ module.exports = React.createClass({
       hideLogo: false,
       disableInteraction: false,
       disableScenes: false,
-      showLngLat: false
+      showLngLat: false,
+      disableButtons: false
     }
   },
 
@@ -121,9 +123,9 @@ module.exports = React.createClass({
   },
 
 
-  tick(){
+  tick(restart){
     var _this = this;
-    if(this.state.playing){
+    if(this.state.playing || restart){
       //increase counters
       var currentYearIndex = this.state.currentYearIndex;
       var currentSceneIndex = this.state.currentSceneIndex;
@@ -212,7 +214,12 @@ module.exports = React.createClass({
 
   play(){
     this.setState({playing: true});
-    this.tick();
+    this.tick(true);
+  },
+
+  resumeDemo(e){
+    e.preventDefault();
+    this.setState({useScenes: true});
   },
 
   clearYearLayers(){
@@ -244,10 +251,26 @@ module.exports = React.createClass({
       lngLat = (<p className="lng-lat">Lng: {this.state.lngLat.lng}, Lat:{this.state.lngLat.lat}, Zoom:{this.state.zoom} </p>)
     }
 
+    var playPause = '';
+    if(!this.props.disableButtons){
+      if(this.state.playing){
+        playPause = (<a className="playPauseButton waves-effect waves-orange btn-floating btn-large orange darken-3" onClick={this.pause}><i className="material-icons">pause</i></a>);
+      } else {
+         playPause = (<a className="playPauseButton waves-effect waves-orange btn-floating btn-large orange darken-3" onClick={this.play}><i className="material-icons">play_arrow</i></a>);
+      }
+    }
+
+    var resumeDemo = '';
+    if(!this.props.disableButtons && !this.props.disableScenes && !this.state.useScenes){
+      resumeDemo = (<a className="resumeButton waves-effect waves-orange btn orange darken-3" onClick={this.resumeDemo}>Resume Demo</a>);
+    }
+
     return <div id="map" className="map" style={{width: '100%', height: '100%'}}>
       {logo}
       {year}
       {lngLat}
+      {playPause}
+      {resumeDemo}
     </div>;
   }
 });
