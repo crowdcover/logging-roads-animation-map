@@ -3,7 +3,8 @@ var React = require('react');
 var mapboxgl = require("mapbox-gl");
 var mapStyles = require('./mapStyles');
 
-
+var years = require('./years');
+var scenes = require('./scenes');
 
 module.exports = React.createClass({
   contextTypes: {
@@ -17,34 +18,24 @@ module.exports = React.createClass({
 
   getInitialState() {
     return {
-      years: [
-        {id: 'before2000', label: 'Before 2000'},
-        {id: '2000', label: '2000'},
-        {id: '2001', label: '2001'},
-        {id: '2002', label: '2002'},
-        {id: '2003', label: '2003'},
-        {id: '2004', label: '2004'},
-        {id: '2005', label: '2005'},
-        {id: '2006', label: '2006'},
-        {id: '2007', label: '2007'},
-        {id: '2008', label: '2008'},
-        {id: '2009', label: '2009'},
-        {id: '2010', label: '2010'},
-        {id: '2011', label: '2011'},
-        {id: '2012', label: '2012'},
-        {id: '2013', label: '2013'},
-        {id: 'after2013', label: 'After 2013'}
-      ],
-      currentYearIndex: 0,
-      currentYearLabel: 'Before 2000'
+      currentYearIndex: -1,
+      currentSceneIndex: 0,
+      useScenes: !this.props.disableScenes,
+      firstLoad: true,
+      waitForStyleChange: false,
+      ignoreMoveCount: 0,
+      styleWaitCallback(){}
     }
   },
 
   getDefaultProps() {
     return {
       hideUI: false,
-      lockMouse: false,
-      hideLogo: false
+      disableScroll: false,
+      hideLogo: false,
+      disableInteraction: false,
+      disableScenes: false,
+      showLngLat: false
     }
   },
 
@@ -56,43 +47,67 @@ module.exports = React.createClass({
 
     var map = new mapboxgl.Map({
       container: 'map',
-      style: mapStyles.dark, //stylesheet location
+      //style: mapStyles.dark, //stylesheet location
+      style: {
+        "version": 8,
+        "sources": {
+            "simple-tiles": {
+                "type": "raster",
+                "url": "mapbox://crowdcover.d5b9ef75",
+                "tileSize": 256
+            }
+        },
+        "layers": [{
+            "id": "simple-tiles",
+            "type": "raster",
+            "source": "simple-tiles",
+            "minzoom": 0,
+            "maxzoom": 22
+        }]
+    },
       zoom: 7.5,
-      center: [22.192, 1.766]
+      center: [22.0715, 2.6769],
+      interactive: !this.props.disableInteraction
     });
+    if(this.props.disableScroll){
+      map.scrollZoom.disable();
+    }
 
-    map.on('style.load', function() {
-
-      if(_this.props.data){
-        _this.initGeoJSON(map, _this.props.data);
+    map.on('moveend', function () {
+      if(_this.state.ignoreMoveCount > 0){
+        _this.setState({ignoreMoveCount: _this.state.ignoreMoveCount-1});
+      }else{
+          var useScenes = _this.state.useScenes;
+          if(useScenes){
+            useScenes = false;
+          }
+          _this.setState({lngLat: map.getCenter(), zoom: map.getZoom(), useScenes});
       }
 
+    });
+
+
+    map.on('style.load', function() {
       map.addSource('logging', {
         'type': 'vector',
         'url': 'mapbox://crowdcover.logging_roads2',
         "minzoom": 6,
         "maxzoom": 12
       });
-/*
-      map.addLayer(require('./mapStyles/before2000'));
-      map.addLayer(require('./mapStyles/2000'));
-      map.addLayer(require('./mapStyles/2001'));
-      map.addLayer(require('./mapStyles/2002'));
-      map.addLayer(require('./mapStyles/2003'));
-      map.addLayer(require('./mapStyles/2004'));
-      map.addLayer(require('./mapStyles/2005'));
-      map.addLayer(require('./mapStyles/2006'));
-      map.addLayer(require('./mapStyles/2007'));
-      map.addLayer(require('./mapStyles/2008'));
-      map.addLayer(require('./mapStyles/2009'));
-      map.addLayer(require('./mapStyles/2010'));
-      map.addLayer(require('./mapStyles/2011'));
-      map.addLayer(require('./mapStyles/2012'));
-      map.addLayer(require('./mapStyles/2013'));
-      map.addLayer(require('./mapStyles/after2013'));
-      */
 
-      _this.play();
+      //roads with unknown start date
+      map.addLayer(mapStyles.unknown);
+
+      if(_this.state.firstLoad){
+
+        _this.setState({firstLoad: false});
+
+        _this.play();
+      } else {
+        _this.state.styleWaitCallback();
+      }
+
+
 
     });
 
@@ -109,15 +124,85 @@ module.exports = React.createClass({
   tick(){
     var _this = this;
     if(this.state.playing){
-      if(this.state.currentYearIndex >= this.state.years.length){
+      //increase counters
+      var currentYearIndex = this.state.currentYearIndex;
+      var currentSceneIndex = this.state.currentSceneIndex;
+      var waitForStyleChange = false;
+      var scene = null, prevScene = null;
+
+      if(currentYearIndex == (years.length)-1){
         //reset to the beginning
+        currentYearIndex = 0;
         this.clearYearLayers();
-        this.setState({currentYearIndex: 0});
+
+        if(this.state.useScenes){
+          //find previous scene
+          if(currentSceneIndex == 0){
+            prevScene = scenes[scenes.length -1];
+          }else{
+            prevScene = scenes[currentSceneIndex];
+          }
+
+          if(currentSceneIndex == scenes.length-1){
+            currentSceneIndex=0;
+          }else{
+            currentSceneIndex++;
+          }
+          scene = scenes[currentSceneIndex];
+          this.setState({ignoreMoveCount: 1});
+          if(prevScene.style.name != scene.style.name){
+            //we need to change the style and wait for it to complete
+            this.map.setStyle(scene.style);
+            waitForStyleChange = true;
+          }else{
+            //we can just fly to the next scene
+            _this.map.flyTo({
+              center: scene.center,
+              zoom: scene.zoom,
+              pitch: scene.pitch
+            });
+
+          }
+
+
+
+        }
+
+      }else{
+        currentYearIndex++;
       }
-      var currYear = this.state.years[this.state.currentYearIndex]
-      this.setYear(currYear.id, currYear.label);
-      //tick again after 1.5 secs
-      setTimeout(function(){ _this.tick() }, 1500);
+
+      //now update the display
+      var currYear = years[currentYearIndex];
+
+      if(waitForStyleChange){
+
+        var waitCallback = function(){
+          setTimeout(function(){
+
+            _this.map.flyTo({
+              center: scene.center,
+              zoom: scene.zoom,
+              pitch: scene.pitch
+            });
+            _this.map.addLayer(mapStyles[currYear.id]);
+
+            //tick again
+            setTimeout(function(){ _this.tick() }, 1000);
+          }, 2000);
+
+
+        };
+        this.setState({currentYearIndex, currentSceneIndex,
+          waitForStyleChange, styleWaitCallback: waitCallback});
+      }else{
+        this.map.addLayer(mapStyles[currYear.id]);
+        this.setState({currentYearIndex, currentSceneIndex, waitForStyleChange});
+        //tick again
+        setTimeout(function(){ _this.tick() }, 1000);
+      }
+
+
     }
   },
 
@@ -130,14 +215,9 @@ module.exports = React.createClass({
     this.tick();
   },
 
-  setYear(id, label){
-    this.map.addLayer(mapStyles[id]);
-    this.setState({currentYearLabel: label, currentYearIndex: this.state.currentYearIndex+1});
-  },
-
   clearYearLayers(){
     var _this = this;
-    this.state.years.forEach(function(year){
+    years.forEach(function(year){
       _this.map.removeLayer(year.id);
     });
   },
@@ -154,9 +234,20 @@ module.exports = React.createClass({
       );
     }
 
+    var year = '';
+    if(years[this.state.currentYearIndex]){
+      year = (<h1 className="year">{years[this.state.currentYearIndex].label}</h1>);
+    }
+
+    var lngLat ='';
+    if(this.props.showLngLat && this.state.lngLat){
+      lngLat = (<p className="lng-lat">Lng: {this.state.lngLat.lng}, Lat:{this.state.lngLat.lat}, Zoom:{this.state.zoom} </p>)
+    }
+
     return <div id="map" className="map" style={{width: '100%', height: '100%'}}>
       {logo}
-      <h1 className="year">{this.state.currentYearLabel}</h1>
+      {year}
+      {lngLat}
     </div>;
   }
 });

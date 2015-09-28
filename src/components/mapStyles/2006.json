@@ -6,9 +6,9 @@
   "minzoom": 0,
   "maxzoom": 22,
   "filter": [
-      "==",
-      "start_date",
-      "2006"
+    "any",
+    ["==","start_date","2006"],
+    ["==","start_date","before 2006"]
   ],
   "paint": {
     "line-color": "#f8bc7b",

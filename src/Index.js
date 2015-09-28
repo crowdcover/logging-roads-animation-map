@@ -9,11 +9,9 @@ window.React = React;
 var App = React.createClass({
 
   render() {
-    var {hideUI, lockMouse, hideLogo} = this.props.location.query;
-
     return (
       <div id="app">
-          <Map hideUI={hideUI} lockMouse={lockMouse} hideLogo={hideLogo}/>
+          <Map {...this.props.location.query}/>
       </div>
     )
   }

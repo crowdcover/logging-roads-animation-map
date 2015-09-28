@@ -1,5 +1,5 @@
 {
-  "id": "2003",
+  "id": "2014",
   "type": "line",
   "source": "logging",
   'source-layer': 'original',
@@ -7,11 +7,11 @@
   "maxzoom": 22,
   "filter": [
     "any",
-    ["==","start_date","2003"],
-    ["==","start_date","before 2003"]
+    ["==","start_date","2014"],
+    ["==","start_date","after 2013"]
   ],
   "paint": {
-    "line-color": "#fadea3",
+    "line-color": "#cc5506",
     "line-opacity": 1,
     "line-cap": "butt",
     "line-join": "miter",
@@ -19,7 +19,6 @@
       "base": 1,
       "stops": [[7, 1.5], [8, 2], [9, 3], [10, 3.5], [11, 4], [12, 6]]
     }
-
 
   }
 }

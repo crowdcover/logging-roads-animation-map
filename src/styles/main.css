@@ -4,7 +4,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   color: #333;
-  background-color: #fff;
+  background-color: #171617;
   margin: 0;
   padding: 0;
 
@@ -25,8 +25,19 @@ html, body, #content, #app {
 }
 .year {
   position: absolute;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
   color: white;
   z-index: 9999;
+  font-size: 3.3em;
+}
+
+.lng-lat {
+  position: absolute;
+  bottom: -12px;
+  left: 5px;
+  color: white;
+  z-index: 9999;
+  font-size: 1.0em;
+  background-color: rgba(0,0,0,0.5);
 }

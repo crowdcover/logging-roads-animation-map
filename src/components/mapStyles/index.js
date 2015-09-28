@@ -1,4 +1,5 @@
 module.exports = {
+  //logging road years
   "before2000": require('./before2000'),
   "2000": require('./2000'),
   "2001": require('./2001'),
@@ -14,7 +15,14 @@ module.exports = {
   "2011": require('./2011'),
   "2012": require('./2012'),
   "2013": require('./2013'),
-  "after2013": require('./after2013'),
-  "dark": require('./dark-v8')
+  "2014": require('./2014'),
+  "unknown": require('./unknown'),
+
+  //mapbox basemaps
+  "dark": require('./dark-v8'),
+  "satelliteHybrid": require('./satellite-hybrid-v8'),
+  "basic": require('./basic-v8'),
+  "light": require('./light-v8'),
+  "streets": require('./streets-v8')
 
 }
