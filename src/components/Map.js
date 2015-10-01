@@ -51,23 +51,7 @@ module.exports = React.createClass({
     var map = new mapboxgl.Map({
       container: 'map',
       //style: mapStyles.dark, //stylesheet location
-      style: {
-        "version": 8,
-        "sources": {
-            "simple-tiles": {
-                "type": "raster",
-                "url": "mapbox://crowdcover.d5b9ef75",
-                "tileSize": 256
-            }
-        },
-        "layers": [{
-            "id": "simple-tiles",
-            "type": "raster",
-            "source": "simple-tiles",
-            "minzoom": 0,
-            "maxzoom": 22
-        }]
-    },
+      style: mapStyles.satelliteHybrid,
       zoom: 7.5,
       center: [22.0715, 2.6769],
       interactive: !this.props.disableInteraction
