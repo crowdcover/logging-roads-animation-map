@@ -237,7 +237,7 @@ module.exports = React.createClass({
     var logo = '';
     if(!this.props.hideLogo){
       logo = (
-        <b className="logo">LOGGING ROADS</b>
+        <a href="http://loggingroads.org"><b className="logo">LOGGING ROADS</b></a>
       );
     }
 
