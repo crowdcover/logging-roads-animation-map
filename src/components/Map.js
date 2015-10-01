@@ -37,7 +37,8 @@ module.exports = React.createClass({
       disableInteraction: false,
       disableScenes: false,
       showLngLat: false,
-      disableButtons: false
+      disableButtons: false,
+      showResume: false
     }
   },
 
@@ -261,7 +262,7 @@ module.exports = React.createClass({
     }
 
     var resumeDemo = '';
-    if(!this.props.disableButtons && !this.props.disableScenes && !this.state.useScenes){
+    if(!this.props.disableButtons && this.props.showResume && !this.props.disableScenes && !this.state.useScenes){
       resumeDemo = (<a className="resumeButton waves-effect waves-orange btn orange darken-3" onClick={this.resumeDemo}>Resume Demo</a>);
     }
 
