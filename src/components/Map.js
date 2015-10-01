@@ -75,11 +75,13 @@ module.exports = React.createClass({
 
 
     map.on('style.load', function() {
+
       map.addSource('logging', {
         'type': 'vector',
-        'url': 'mapbox://crowdcover.logging_roads2',
-        "minzoom": 6,
-        "maxzoom": 12
+        //'url': 'mapbox://crowdcover.e06eb11a',
+        "tiles": ['http://loggingroads.org:8080/loggingroads/{z}/{x}/{y}.pbf'],
+        "minzoom": 0,
+        "maxzoom": 22
       });
 
       //roads with unknown start date
