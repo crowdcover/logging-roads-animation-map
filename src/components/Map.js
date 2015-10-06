@@ -79,7 +79,7 @@ module.exports = React.createClass({
       map.addSource('logging', {
         'type': 'vector',
         //'url': 'mapbox://crowdcover.e06eb11a',
-        "tiles": ['http://loggingroads.org:8080/loggingroads/{z}/{x}/{y}.pbf'],
+        "tiles": ['http://loggingroads.org:8081/loggingroads/{z}/{x}/{y}.pbf'],
         "minzoom": 0,
         "maxzoom": 22
       });
