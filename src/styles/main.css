@@ -16,7 +16,7 @@ html, body, #content, #app {
 }
 
 .logo {
-  color: #FC7C1F;
+  color: #FC574B;
 	font-size: 3.0rem;
   position: absolute;
   top: 20px;
@@ -46,6 +46,7 @@ html, body, #content, #app {
 
 .playPauseButton {
   color: #FFF;
+  background-color: #FC574B;
   position: absolute;
   left: 10px;
   bottom: 10px;
@@ -58,4 +59,8 @@ html, body, #content, #app {
   position: absolute;
   left: 75px;
   bottom: 20px;
+}
+
+.mapboxgl-ctrl-compass {
+  display: none !important;
 }

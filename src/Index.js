@@ -1,6 +1,7 @@
 import React from 'react';
+import ReactDom from 'react-dom';
 /*eslint-disable */
-import {Router, Route} from 'react-router';
+import { Router, Route, browserHistory } from 'react-router'
 import Map from './components/Map';
 /*eslint-enable */
 
@@ -17,10 +18,12 @@ var App = React.createClass({
   }
 });
 
-React.render(
-  <Router>
+ReactDom.render(
+  (
+  <Router  history={browserHistory}>
     <Route path="/" component={App}>
     </Route>
   </Router>
+  )
   , document.getElementById('content')
 );

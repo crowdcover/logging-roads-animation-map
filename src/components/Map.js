@@ -1,7 +1,8 @@
 var React = require('react');
 
 var mapboxgl = require("mapbox-gl");
-var mapStyles = require('./mapStyles');
+var baseMapStyles = require('./mapStyles');
+var styles = require('./styles');
 
 var years = require('./years');
 var scenes = require('./scenes');
@@ -51,10 +52,12 @@ module.exports = React.createClass({
     var map = new mapboxgl.Map({
       container: 'map',
       //style: mapStyles.dark, //stylesheet location
-      style: mapStyles.satelliteHybrid,
+      style: baseMapStyles.satelliteHybrid,
       zoom: 7.5,
       center: [22.0715, 2.6769],
-      interactive: !this.props.disableInteraction
+      interactive: !this.props.disableInteraction,
+      dragRotate: false,
+      touchZoomRotate: false
     });
     if(this.props.disableScroll){
       map.scrollZoom.disable();
@@ -76,15 +79,21 @@ module.exports = React.createClass({
 
     map.on('style.load', function() {
 
-      map.addSource('logging', {
-        'type': 'vector',
-        "tiles": ['https://loggingroads.org/tiles/loggingroads/{z}/{x}/{y}.pbf'],
-        "minzoom": 0,
-        "maxzoom": 22
+      styles.getSources().forEach(function(source){
+         map.addSource(source.name, source.config);
       });
 
-      //roads with unknown start date
-      map.addLayer(mapStyles.unknown);
+      styles.getUnknown().forEach(function(layer){
+        map.addLayer(layer);
+      })
+
+      years.forEach(function(year){
+      var layers = styles.getYear(year.id);
+    
+      layers.forEach(function(layer){
+         map.addLayer(layer);
+      });
+    });
 
       if(_this.state.firstLoad){
 
@@ -100,7 +109,7 @@ module.exports = React.createClass({
     });
 
     if(!this.props.hideUI){
-      map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
+      map.addControl(new mapboxgl.NavigationControl(), 'top-left');
     }
 
 
@@ -146,13 +155,10 @@ module.exports = React.createClass({
             //we can just fly to the next scene
             _this.map.flyTo({
               center: scene.center,
-              zoom: scene.zoom,
-              pitch: scene.pitch
+              zoom: scene.zoom
             });
 
           }
-
-
 
         }
 
@@ -173,8 +179,11 @@ module.exports = React.createClass({
               zoom: scene.zoom,
               pitch: scene.pitch
             });
-            _this.map.addLayer(mapStyles[currYear.id]);
 
+            styles.getYear(currYear.id).forEach(function(layer){
+               _this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+            });
+          
             //tick again
             setTimeout(function(){ _this.tick() }, 1000);
           }, 2000);
@@ -184,7 +193,9 @@ module.exports = React.createClass({
         this.setState({currentYearIndex, currentSceneIndex,
           waitForStyleChange, styleWaitCallback: waitCallback});
       }else{
-        this.map.addLayer(mapStyles[currYear.id]);
+        styles.getYear(currYear.id).forEach(function(layer){
+            _this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+        });
         this.setState({currentYearIndex, currentSceneIndex, waitForStyleChange});
         //tick again
         setTimeout(function(){ _this.tick() }, 1000);
@@ -211,7 +222,11 @@ module.exports = React.createClass({
   clearYearLayers(){
     var _this = this;
     years.forEach(function(year){
-      _this.map.removeLayer(year.id);
+      var layers = styles.getYear(year.id);
+      
+      layers.forEach(function(layer){
+         _this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+      });
     });
   },
 
@@ -240,9 +255,9 @@ module.exports = React.createClass({
     var playPause = '';
     if(!this.props.disableButtons){
       if(this.state.playing){
-        playPause = (<a className="playPauseButton waves-effect waves-orange btn-floating btn-large orange darken-3" onClick={this.pause}><i className="material-icons">pause</i></a>);
+        playPause = (<a className="playPauseButton waves-effect waves-orange btn-floating btn-large" onClick={this.pause}><i className="material-icons">pause</i></a>);
       } else {
-         playPause = (<a className="playPauseButton waves-effect waves-orange btn-floating btn-large orange darken-3" onClick={this.play}><i className="material-icons">play_arrow</i></a>);
+         playPause = (<a className="playPauseButton waves-effect waves-orange btn-floating btn-large" onClick={this.play}><i className="material-icons">play_arrow</i></a>);
       }
     }
 

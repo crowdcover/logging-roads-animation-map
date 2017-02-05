@@ -11,7 +11,7 @@ module.exports = [
   {
     zoom: 10.6597,
     center: [21.482225485, 2.25666983],
-    pitch: 10,
+    pitch: 90,
     style: mapStyles.satelliteHybrid
   },
   {
